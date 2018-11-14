@@ -12,6 +12,7 @@ from __future__ import print_function
 from fenics import *
 import numpy as np
 from dolfin import * 
+import random
 np.random.seed(1)
 T = 2.0            # final time
 num_steps = 10     # number of time steps
@@ -50,23 +51,26 @@ f = Constant(beta - 2 - 2*alpha)
 # K-L expansion
 M = 5 # M^2 terms in the K-L expansion
 Q_eigval = lambda i,j: 250/(float(i)*float(j))**3; # eigenvalues of Q
-
-class QWienerProcess(Expression): # Q-Wiener process as an expression
-	def __init__(self, randoms, degree):
-		self.randoms = randoms # random numbers to be updated each time step
-		self.degree = degree
-
-	def eval(self, value, x): # evaluate K-L expansion
-		v = 0
-		for i in range(0,M):
-			for j in range(0,M):
-				v += 2*sqrt(dt)*cos((i+1)*np.pi*x[0])*cos((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
-				value[0]=v
+class QWienerProcess(): # Q-Wiener process as an expression
+  def __init__(self, randoms,degree):
+    self.randoms = randoms # random numbers to be updated each time step
+    self.degree = degree
+  def eval(self, value, x): # evaluate K-L expansion
+    v = 0
+    for i in range(0,M):
+      for j in range(0,M):
+        v += 2*sqrt(dt)*cos((i+1)*np.pi*x[0])*cos((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
+        print(Q_eigval(i+1,j+1))
+        print(self.randoms[i,j])
+        value[0]=v
 
 g = 1  # Amplitude for noise.  g=0 no noise.  
 s = np.random.normal(0, 1, (M,M))
 dW = QWienerProcess(degree=2,randoms=s)
-F = u*v*dx + dt*dot(grad(u), grad(v))*dx - (u_n + dt*f)*v*dx
+print(dW(value=[0],x=[0,0]))
+
+"""
+F = u*v*dx + dt*dot(grad(u), grad(v))*dx - (u_n + dt*dW)*v*dx
 a, L = lhs(F), rhs(F)
 
 
@@ -97,4 +101,4 @@ import matplotlib.pyplot as plt
 plot(u_n)
 
 plt.savefig('foo.png', bbox_inches='tight')
-
+"""
