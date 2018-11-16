@@ -12,26 +12,27 @@ from __future__ import print_function
 from fenics import *
 import numpy as np
 from dolfin import * 
-
 import random
+import matplotlib.pyplot as plt
+
 parameters["form_compiler"]["optimize"]     = True
 parameters["form_compiler"]["cpp_optimize"] = True
-np.random.seed(1)
+np.random.seed()
 T = 2.0            # final time
 num_steps = 10     # number of time steps
 dt = T / num_steps # time step size
 alpha = 3          # parameter alpha
 beta = 1.2         # parameter beta
-
+q=1.0
 # Create mesh and define function space
-nx = ny = 96
+nx = ny = 8
 mesh = UnitSquareMesh(nx, ny)
 P1 = FiniteElement("Lagrange", mesh.ufl_cell(), 1)
 V = FunctionSpace(mesh,P1)
 
 # Define boundary condition
-u_D =Constant(0);
-
+#u_D =Constant(0);
+u_D=Expression('1+x[0]*x[0]+alpha*x[1]*x[1]+beta*t',degree=2,alpha=alpha,beta=beta,t=0)
 # Expression('1 + cos(x[0]*x[0]) + alpha*sin(x[1]) + beta*(t)',
 #                 degree=2, alpha=alpha, beta=beta, t=0)
 
@@ -41,13 +42,14 @@ def boundary(x, on_boundary):
 bc = DirichletBC(V, u_D, boundary)
 
 # Define initial value
-u_n = interpolate(Constant(np.random.normal(0,1)), V)
+u_n = interpolate(Constant(10), V)
 #u_n = project(u_D, V)
 
 # Define variational problem
 u = TrialFunction(V)
 v = TestFunction(V)
 f = Constant(beta - 2 - 2*alpha)
+#f = Constant(0)
 
 
 ##
@@ -73,7 +75,7 @@ dW = QWienerProcess(degree=2,randoms=s)
 
 #F = 
 a= u*v*dx + dt*dot(grad(u), grad(v))*dx
-L=(u_n + dt*dW)*v*dx
+L=(u_n + dt*q*dW+dt*f)*v*dx
 #L=dW
 
 #a, L = lhs(F), rhs(F)
@@ -84,9 +86,9 @@ u = Function(V)
 t = 0
 for n in range(num_steps):
 
-    # Update current time
+    # Update current time, fix solver? at the time it is very slow
     t += dt
-    u_D.t = t
+    #u_D.t = t
     dW.randoms =  np.random.normal(0, 1, (M,M))
     # Compute solution
     solve(a == L, u, bc)
@@ -100,9 +102,16 @@ for n in range(num_steps):
 
     # Update previous solution
     u_n.assign(u)
+	
 
 # Hold plot
-import matplotlib.pyplot as plt 
+#cast u_n to a vector 
 plot(u_n)
 
-plt.savefig('foo.png', bbox_inches='tight')
+#ax = plt.subplot(111)
+#im = ax.imshow(u_n)
+#divider = make_axes_locatable(ax)
+#cax = divider.append_axes("rigth", size="5%", pad = 0.05)
+
+#plt.colorbar(im, cax = cax)
+plt.savefig('brusGrovMconstq=1.png', bbox_inches='tight')
