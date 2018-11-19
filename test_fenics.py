@@ -66,7 +66,7 @@ class QWienerProcess(UserExpression): # Q-Wiener process as an expression
     v = 0
     for i in range(0,M):
       for j in range(0,M):
-        v += 2*sqrt(dt)*cos((i+1)*np.pi*x[0])*cos((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
+        v += 2*sqrt(dt)*sin((i+1)*np.pi*x[0])*sin((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
         value[0]=v
 
 g = 1  # Amplitude for noise.  g=0 no noise.  
@@ -88,7 +88,7 @@ for n in range(num_steps):
 
     # Update current time, fix solver? at the time it is very slow
     t += dt
-    #u_D.t = t
+    u_D.t = t
     dW.randoms =  np.random.normal(0, 1, (M,M))
     # Compute solution
     solve(a == L, u, bc)
@@ -115,3 +115,4 @@ plot(u_n)
 
 #plt.colorbar(im, cax = cax)
 plt.savefig('brusGrovMconstq=1.png', bbox_inches='tight')
+
