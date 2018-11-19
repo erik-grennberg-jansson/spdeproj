@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 parameters["form_compiler"]["optimize"]     = True
 parameters["form_compiler"]["cpp_optimize"] = True
 np.random.seed()
-T = 2.0            # final time
-num_steps = 10     # number of time steps
+T = 10.0            # final time
+num_steps = 200     # number of time steps
 dt = T / num_steps # time step size
 alpha = 3          # parameter alpha
 beta = 1.2         # parameter beta
@@ -42,7 +42,7 @@ def boundary(x, on_boundary):
 bc = DirichletBC(V, u_D, boundary)
 
 # Define initial value
-u_n = interpolate(Constant(10), V)
+u_n = interpolate(u_D, V)
 #u_n = project(u_D, V)
 
 # Define variational problem
