@@ -54,8 +54,9 @@ X_D=Expression('1+t+x[0]*x[0]+pow(x[1],x[0])+pow(t,x[1]*x[0])',degree=2,t=0)
 bc = DirichletBC(ME, X_D, boundary)
 
 class InitialConditions(UserExpression):
-    def __init__(self):
-        random.seed(2)
+    def __init__(self, **kwargs):
+        random.seed(2 + MPI.rank(MPI.comm_world))
+        super().__init__(**kwargs)
     def eval(self, values, x):
         values[0] = 0.63 + 0.02*(0.5 - random.random())
         values[1] = 0.0
@@ -70,7 +71,7 @@ Z_n=interpolate(X_D,ME)
 
 
 def f(u):
-	return u**3-u*beta**2
+	return u**3-u*beta**2‘
 
 g=Expression('x[0]*x[1]*x[0]-beta',beta=beta,degree=2)
 aY=Y*v*dx+0.5*dt*dot(grad(Y),grad(v))*dx
