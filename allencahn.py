@@ -23,7 +23,7 @@ class QWienerProcess(UserExpression): # Q-Wiener process as an expression
 		v = 0
 		for i in range(0,M):
 			for j in range(0,M):
-				v += 2*sqrt(dt)*cos((i+1)*np.pi*x[0])*cos((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
+				v += 2*sqrt(dt)*sin((i+1)*np.pi*x[0])*sin((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
 				value[0]=v
 
 g = 1  # Amplitude for noise.  g=0 no noise.  
