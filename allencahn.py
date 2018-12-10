@@ -15,10 +15,9 @@ M = 5 # M^2 terms in the K-L expansion
 Q_eigval = lambda i,j: 250/(float(i)*float(j))**3; # eigenvalues of Q
 
 class QWienerProcess(UserExpression): # Q-Wiener process as an expression
-	def __init__(self, randoms, degree):
-		self.randoms = randoms # random numbers to be updated each time step
-		self.degree = degree
-
+	def __init__(self, randoms, **kwargs):
+                super(QWienerProcess,self).__init__(**kwargs)
+                self.randoms=randoms
 	def eval(self, value, x): # evaluate K-L expansion
 		v = 0
 		for i in range(0,M):
@@ -26,6 +25,9 @@ class QWienerProcess(UserExpression): # Q-Wiener process as an expression
 				v += 2*sqrt(dt)*sin((i+1)*np.pi*x[0])*sin((j+1)*np.pi*x[1])*self.randoms[i,j]*sqrt(Q_eigval(i+1,j+1))
 				value[0]=v
 
+        def value_shape(self):
+                return()
+        
 g = 1  # Amplitude for noise.  g=0 no noise.  
 s = np.random.normal(0, 1, (M,M))
 dW = QWienerProcess(degree=2,randoms=s)
