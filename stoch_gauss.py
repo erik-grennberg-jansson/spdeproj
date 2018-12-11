@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 T=0.1
 dt=10**(-3)
 num_steps=int(T/dt)
-nx=ny=1000
+nx=ny=16
 q=10.0
 mesh=UnitSquareMesh(nx,ny)
 P1=FiniteElement("Lagrange",mesh.ufl_cell(),degree=1)
@@ -15,7 +15,7 @@ print(dt)
 # K-L expansion
 
 M = 5 # M^2 terms in the K-L expansion
-Q_eigval = lambda i,j: 250/(float(i)*float(j))**3; # eigenvalues of Q
+Q_eigval = lambda i,j: 1/(float(i)*float(j))**0; # eigenvalues of Q
 
 class QWienerProcess(UserExpression): # Q-Wiener process as an expression
     def __init__(self, randoms, **kwargs):
@@ -33,10 +33,8 @@ class QWienerProcess(UserExpression): # Q-Wiener process as an expression
         return ()
 
 s = np.random.normal(0, 1, (M,M))
-dW = QWienerProcess(degree=0,randoms=s)
+dW = QWienerProcess(degree=2,randoms=s)
 dx=Measure('dx',domain=mesh)
-
-
 
 def boundary(x,on_boundary):
     return on_boundary
